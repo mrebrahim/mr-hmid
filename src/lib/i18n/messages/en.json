@@ -48,6 +48,8 @@
   "appointments": {
     "title": "Appointments",
     "newAppointment": "New Appointment",
+    "loading": "Loading appointments...",
+    "noResults": "No appointments found",
     "date": "Date",
     "time": "Time",
     "patient": "Patient",

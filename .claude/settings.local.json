@@ -57,7 +57,8 @@
       "Bash(git push:*)",
       "Bash(npx supabase:*)",
       "Bash(git commit:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(ls:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
