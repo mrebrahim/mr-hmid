@@ -1,0 +1,159 @@
+{
+  "common": {
+    "appName": "Dental Clinic",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "noResults": "No results found",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "loginError": "Login error",
+    "invalidCredentials": "Invalid email or password"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "appointments": "Appointments",
+    "patients": "Patients",
+    "services": "Services",
+    "schedule": "Schedule",
+    "conversations": "Conversations",
+    "knowledgeBase": "Knowledge Base",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "todayAppointments": "Today's Appointments",
+    "pendingAppointments": "Pending Appointments",
+    "totalPatients": "Total Patients",
+    "recentActivity": "Recent Activity"
+  },
+  "appointments": {
+    "title": "Appointments",
+    "newAppointment": "New Appointment",
+    "date": "Date",
+    "time": "Time",
+    "patient": "Patient",
+    "service": "Service",
+    "status": "Status",
+    "notes": "Notes",
+    "duration": "Duration",
+    "statuses": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "no_show": "No Show"
+    },
+    "actions": {
+      "confirm": "Confirm Appointment",
+      "cancel": "Cancel Appointment",
+      "complete": "Complete Appointment",
+      "noShow": "Mark as No Show",
+      "reschedule": "Reschedule"
+    },
+    "filters": {
+      "all": "All",
+      "today": "Today",
+      "upcoming": "Upcoming",
+      "past": "Past"
+    }
+  },
+  "patients": {
+    "title": "Patients",
+    "newPatient": "New Patient",
+    "name": "Name",
+    "phone": "Phone",
+    "email": "Email",
+    "notes": "Notes",
+    "appointmentHistory": "Appointment History",
+    "conversationHistory": "Conversation History"
+  },
+  "services": {
+    "title": "Services",
+    "newService": "New Service",
+    "name": "Service Name",
+    "nameAr": "Name (Arabic)",
+    "nameEn": "Name (English)",
+    "description": "Description",
+    "price": "Price",
+    "duration": "Duration (minutes)",
+    "active": "Active",
+    "currency": "AED"
+  },
+  "schedule": {
+    "title": "Schedule",
+    "days": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    },
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "slotDuration": "Slot Duration",
+    "active": "Working Day",
+    "closed": "Closed",
+    "blockedDates": "Blocked Dates",
+    "addBlockedDate": "Add Blocked Date",
+    "reason": "Reason"
+  },
+  "conversations": {
+    "title": "Conversations",
+    "patient": "Patient",
+    "message": "Message",
+    "sender": "Sender",
+    "timestamp": "Time",
+    "senders": {
+      "patient": "Patient",
+      "ai_agent": "AI Assistant"
+    }
+  },
+  "knowledgeBase": {
+    "title": "Knowledge Base",
+    "newEntry": "New Entry",
+    "entryTitle": "Title",
+    "content": "Content",
+    "category": "Category",
+    "categories": {
+      "faq": "FAQ",
+      "service": "Services",
+      "policy": "Policies",
+      "general": "General"
+    },
+    "active": "Active"
+  },
+  "time": {
+    "minutes": "minutes",
+    "hours": "hours",
+    "am": "AM",
+    "pm": "PM"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "invalidPhone": "Invalid phone number",
+    "minLength": "Must be at least {min} characters",
+    "maxLength": "Must not exceed {max} characters"
+  }
+}

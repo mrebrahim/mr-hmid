@@ -1,0 +1,162 @@
+{
+  "common": {
+    "appName": "عيادة الأسنان",
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "add": "إضافة",
+    "search": "بحث",
+    "filter": "تصفية",
+    "select": "اختر",
+    "noResults": "لا توجد نتائج",
+    "confirm": "تأكيد",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "close": "إغلاق",
+    "yes": "نعم",
+    "no": "لا"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "loginError": "خطأ في تسجيل الدخول",
+    "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+  },
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "appointments": "المواعيد",
+    "patients": "المرضى",
+    "services": "الخدمات",
+    "schedule": "جدول العمل",
+    "conversations": "المحادثات",
+    "knowledgeBase": "قاعدة المعرفة",
+    "settings": "الإعدادات"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "todayAppointments": "مواعيد اليوم",
+    "pendingAppointments": "مواعيد معلقة",
+    "totalPatients": "إجمالي المرضى",
+    "recentActivity": "النشاط الأخير"
+  },
+  "appointments": {
+    "title": "المواعيد",
+    "newAppointment": "موعد جديد",
+    "loading": "جاري تحميل المواعيد...",
+    "noResults": "لا توجد مواعيد",
+    "date": "التاريخ",
+    "time": "الوقت",
+    "patient": "المريض",
+    "service": "الخدمة",
+    "status": "الحالة",
+    "notes": "ملاحظات",
+    "duration": "المدة",
+    "statuses": {
+      "pending": "معلق",
+      "confirmed": "مؤكد",
+      "completed": "مكتمل",
+      "cancelled": "ملغي",
+      "no_show": "لم يحضر"
+    },
+    "actions": {
+      "confirm": "تأكيد الموعد",
+      "cancel": "إلغاء الموعد",
+      "complete": "إتمام الموعد",
+      "noShow": "تسجيل عدم الحضور",
+      "reschedule": "إعادة جدولة"
+    },
+    "filters": {
+      "all": "الكل",
+      "today": "اليوم",
+      "upcoming": "القادمة",
+      "past": "السابقة"
+    }
+  },
+  "patients": {
+    "title": "المرضى",
+    "newPatient": "مريض جديد",
+    "name": "الاسم",
+    "phone": "رقم الهاتف",
+    "email": "البريد الإلكتروني",
+    "notes": "ملاحظات",
+    "appointmentHistory": "سجل المواعيد",
+    "conversationHistory": "سجل المحادثات"
+  },
+  "services": {
+    "title": "الخدمات",
+    "newService": "خدمة جديدة",
+    "name": "اسم الخدمة",
+    "nameAr": "الاسم بالعربية",
+    "nameEn": "الاسم بالإنجليزية",
+    "description": "الوصف",
+    "price": "السعر",
+    "duration": "المدة (بالدقائق)",
+    "active": "نشط",
+    "currency": "درهم"
+  },
+  "schedule": {
+    "title": "جدول العمل",
+    "days": {
+      "0": "الأحد",
+      "1": "الاثنين",
+      "2": "الثلاثاء",
+      "3": "الأربعاء",
+      "4": "الخميس",
+      "5": "الجمعة",
+      "6": "السبت"
+    },
+    "startTime": "وقت البدء",
+    "endTime": "وقت الانتهاء",
+    "slotDuration": "مدة الفترة",
+    "active": "يوم عمل",
+    "closed": "مغلق",
+    "blockedDates": "التواريخ المحجوبة",
+    "addBlockedDate": "إضافة تاريخ محجوب",
+    "reason": "السبب"
+  },
+  "conversations": {
+    "title": "المحادثات",
+    "patient": "المريض",
+    "message": "الرسالة",
+    "sender": "المرسل",
+    "timestamp": "الوقت",
+    "senders": {
+      "patient": "المريض",
+      "ai_agent": "المساعد الآلي"
+    }
+  },
+  "knowledgeBase": {
+    "title": "قاعدة المعرفة",
+    "newEntry": "إدخال جديد",
+    "entryTitle": "العنوان",
+    "content": "المحتوى",
+    "category": "التصنيف",
+    "categories": {
+      "faq": "أسئلة شائعة",
+      "service": "خدمات",
+      "policy": "سياسات",
+      "general": "عام"
+    },
+    "active": "نشط"
+  },
+  "time": {
+    "minutes": "دقيقة",
+    "hours": "ساعة",
+    "am": "ص",
+    "pm": "م"
+  },
+  "validation": {
+    "required": "هذا الحقل مطلوب",
+    "invalidEmail": "بريد إلكتروني غير صالح",
+    "invalidPhone": "رقم هاتف غير صالح",
+    "minLength": "يجب أن يكون على الأقل {min} أحرف",
+    "maxLength": "يجب أن لا يتجاوز {max} حرف"
+  }
+}
