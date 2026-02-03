@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Calendar, Clock, Users, CheckCircle, MessageCircle, Check, X, Loader2 } from 'lucide-react';
+import { Calendar, Clock, Users, CheckCircle, MessageCircle, Check, X, Loader2, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppointments } from '@/hooks/use-appointments';
 import { useAppointmentsRealtime } from '@/hooks/use-realtime';
@@ -152,14 +152,25 @@ function RequestCard({ appointment, onConfirm, onCancel, locale }: RequestCardPr
 export default function DashboardPage() {
   const t = useTranslations('dashboard');
   const locale = useLocale() as Locale;
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Fetch all appointments
   const { appointments, isLoading, updateStatus, refetch } = useAppointments();
 
   // Enable realtime updates
-  useAppointmentsRealtime(() => {
+  const { isConnected } = useAppointmentsRealtime(() => {
     refetch();
   });
+
+  // Manual refresh handler
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setTimeout(() => setIsRefreshing(false), 500);
+    }
+  };
 
   // Calculate stats
   const today = new Date().toISOString().split('T')[0];
@@ -216,8 +227,24 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
+      <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+        <button
+          onClick={handleRefresh}
+          disabled={isRefreshing || isLoading}
+          className={cn(
+            'flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium',
+            'bg-primary text-primary-foreground hover:bg-primary/90',
+            'disabled:opacity-50 disabled:cursor-not-allowed',
+            'transition-colors'
+          )}
+          title={locale === 'ar' ? 'تحديث البيانات' : 'Refresh Data'}
+        >
+          <RefreshCw className={cn('h-4 w-4', (isRefreshing || isLoading) && 'animate-spin')} />
+          <span className="hidden sm:inline">
+            {locale === 'ar' ? 'تحديث' : 'Refresh'}
+          </span>
+        </button>
       </div>
 
       {/* Stats Grid */}

@@ -1,13 +1,17 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-import { LogOut, User } from 'lucide-react';
+import { useTranslations, useLocale } from 'next-intl';
+import { LogOut, User, Wifi, WifiOff } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
+import { useAppointmentsRealtime } from '@/hooks/use-realtime';
 import { cn } from '@/lib/utils';
+import type { Locale } from '@/lib/i18n/config';
 
 export function Header() {
   const t = useTranslations();
+  const locale = useLocale() as Locale;
   const { staff, signOut } = useAuth();
+  const { isConnected } = useAppointmentsRealtime();
 
   const handleSignOut = async () => {
     await signOut();
@@ -20,6 +24,31 @@ export function Header() {
       </div>
 
       <div className="flex items-center gap-4">
+        {/* Real-time Connection Indicator */}
+        <div
+          className={cn(
+            'flex items-center gap-2 px-3 py-1 rounded-full text-xs',
+            isConnected
+              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+              : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+          )}
+          title={
+            isConnected
+              ? locale === 'ar' ? 'متصل - يتم مزامنة البيانات تلقائيًا' : 'Connected - Data syncing automatically'
+              : locale === 'ar' ? 'غير متصل' : 'Disconnected'
+          }
+        >
+          {isConnected ? (
+            <Wifi className="h-3 w-3" />
+          ) : (
+            <WifiOff className="h-3 w-3" />
+          )}
+          <span className="hidden md:inline">
+            {isConnected
+              ? locale === 'ar' ? 'متزامن' : 'Synced'
+              : locale === 'ar' ? 'غير متصل' : 'Offline'}
+          </span>
+        </div>
         {staff && (
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-sm">

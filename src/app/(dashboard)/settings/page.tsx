@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Settings, Wifi, WifiOff, Activity, Globe } from 'lucide-react';
+import { Settings, Wifi, WifiOff, Activity, Globe, Trash2, RefreshCw, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { useAppointmentsRealtime } from '@/hooks/use-realtime';
@@ -13,6 +14,59 @@ export default function SettingsPage() {
   const locale = useLocale() as Locale;
   const { staff, isAdmin } = useAuth();
   const { isConnected: realtimeConnected } = useAppointmentsRealtime();
+
+  const [isClearing, setIsClearing] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [clearSuccess, setClearSuccess] = useState(false);
+  const [refreshSuccess, setRefreshSuccess] = useState(false);
+
+  const handleClearCache = async () => {
+    setIsClearing(true);
+    setClearSuccess(false);
+
+    try {
+      // Clear localStorage
+      localStorage.clear();
+
+      // Clear sessionStorage
+      sessionStorage.clear();
+
+      // Clear Service Worker caches if available
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(
+          cacheNames.map(cacheName => caches.delete(cacheName))
+        );
+      }
+
+      setClearSuccess(true);
+
+      // Show success for 3 seconds then reload
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to clear cache:', error);
+      alert(locale === 'ar' ? 'فشل في مسح الذاكرة المؤقتة' : 'Failed to clear cache');
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
+  const handleForceRefresh = async () => {
+    setIsRefreshing(true);
+    setRefreshSuccess(false);
+
+    try {
+      // Force reload without cache
+      window.location.reload();
+      setRefreshSuccess(true);
+    } catch (error) {
+      console.error('Failed to refresh:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -153,6 +207,87 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Cache Management Section */}
+      <div className="rounded-lg border bg-card p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Trash2 className="h-5 w-5" />
+          <h2 className="text-lg font-semibold">
+            {locale === 'ar' ? 'إدارة الذاكرة المؤقتة' : 'Cache Management'}
+          </h2>
+        </div>
+
+        <p className="text-sm text-muted-foreground mb-4">
+          {locale === 'ar'
+            ? 'إذا كنت تواجه مشاكل في تحميل البيانات، يمكنك مسح الذاكرة المؤقتة أو إعادة تحميل الصفحة'
+            : 'If you are experiencing issues loading data, you can clear the cache or force refresh the page'}
+        </p>
+
+        <div className="flex flex-col gap-3">
+          {/* Clear Cache Button */}
+          <button
+            onClick={handleClearCache}
+            disabled={isClearing || clearSuccess}
+            className={cn(
+              'flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium',
+              'transition-colors',
+              clearSuccess
+                ? 'bg-green-600 text-white'
+                : 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+              'disabled:opacity-50 disabled:cursor-not-allowed'
+            )}
+          >
+            {isClearing ? (
+              <>
+                <RefreshCw className="h-4 w-4 animate-spin" />
+                {locale === 'ar' ? 'جاري المسح...' : 'Clearing...'}
+              </>
+            ) : clearSuccess ? (
+              <>
+                <Check className="h-4 w-4" />
+                {locale === 'ar' ? 'تم المسح!' : 'Cleared!'}
+              </>
+            ) : (
+              <>
+                <Trash2 className="h-4 w-4" />
+                {locale === 'ar' ? 'مسح الذاكرة المؤقتة' : 'Clear Cache'}
+              </>
+            )}
+          </button>
+
+          {/* Force Refresh Button */}
+          <button
+            onClick={handleForceRefresh}
+            disabled={isRefreshing}
+            className={cn(
+              'flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium',
+              'bg-primary text-primary-foreground hover:bg-primary/90',
+              'disabled:opacity-50 disabled:cursor-not-allowed',
+              'transition-colors'
+            )}
+          >
+            {isRefreshing ? (
+              <>
+                <RefreshCw className="h-4 w-4 animate-spin" />
+                {locale === 'ar' ? 'جاري التحديث...' : 'Refreshing...'}
+              </>
+            ) : (
+              <>
+                <RefreshCw className="h-4 w-4" />
+                {locale === 'ar' ? 'إعادة تحميل البيانات' : 'Force Refresh Data'}
+              </>
+            )}
+          </button>
+        </div>
+
+        {clearSuccess && (
+          <p className="mt-3 text-sm text-green-600 dark:text-green-400">
+            {locale === 'ar'
+              ? 'سيتم إعادة تحميل الصفحة...'
+              : 'Page will reload...'}
+          </p>
+        )}
       </div>
     </div>
   );
