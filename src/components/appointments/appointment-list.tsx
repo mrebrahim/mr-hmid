@@ -26,13 +26,12 @@ export function AppointmentList({ initialFilters }: AppointmentListProps) {
   const locale = useLocale() as Locale;
 
   const [statusFilter, setStatusFilter] = useState<AppointmentStatus | 'all'>('all');
-  const [dateFilter, setDateFilter] = useState<string>(
-    initialFilters?.date || new Date().toISOString().split('T')[0]
-  );
+  const [dateFilter, setDateFilter] = useState<string>(initialFilters?.date || '');
+  const [showAllDates, setShowAllDates] = useState(true);
 
   const filters: AppointmentFilters = {
     ...initialFilters,
-    date: dateFilter,
+    date: showAllDates ? undefined : (dateFilter || undefined),
     status: statusFilter !== 'all' ? statusFilter : undefined,
   };
 
@@ -79,22 +78,58 @@ export function AppointmentList({ initialFilters }: AppointmentListProps) {
     <div className="space-y-4">
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-4">
-        {/* Date picker */}
-        <div>
-          <label htmlFor="date" className="sr-only">
-            {t('date')}
-          </label>
-          <input
-            id="date"
-            type="date"
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
+        {/* Date filter toggle */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              setShowAllDates(true);
+              setDateFilter('');
+            }}
             className={cn(
-              'rounded-md border border-input bg-background px-3 py-2 text-sm',
-              'focus:outline-none focus:ring-2 focus:ring-ring'
+              'px-3 py-2 text-sm rounded-md transition-colors',
+              showAllDates
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted hover:bg-muted/80 text-muted-foreground'
             )}
-          />
+          >
+            {locale === 'ar' ? 'جميع التواريخ' : 'All Dates'}
+          </button>
+          <button
+            onClick={() => {
+              setShowAllDates(false);
+              if (!dateFilter) {
+                setDateFilter(new Date().toISOString().split('T')[0]);
+              }
+            }}
+            className={cn(
+              'px-3 py-2 text-sm rounded-md transition-colors',
+              !showAllDates
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+            )}
+          >
+            {locale === 'ar' ? 'تاريخ محدد' : 'Specific Date'}
+          </button>
         </div>
+
+        {/* Date picker (shown only when specific date is selected) */}
+        {!showAllDates && (
+          <div>
+            <label htmlFor="date" className="sr-only">
+              {t('date')}
+            </label>
+            <input
+              id="date"
+              type="date"
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className={cn(
+                'rounded-md border border-input bg-background px-3 py-2 text-sm',
+                'focus:outline-none focus:ring-2 focus:ring-ring'
+              )}
+            />
+          </div>
+        )}
 
         {/* Status filter */}
         <div className="flex flex-wrap gap-1">
