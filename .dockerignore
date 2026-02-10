@@ -1,0 +1,16 @@
+Dockerfile
+.dockerignore
+node_modules
+npm-debug.log
+.next
+.git
+.gitignore
+.env*.local
+.env.local
+.env.production
+README.md
+DEPLOYMENT.md
+.claude
+specs
+n8n
+nul
