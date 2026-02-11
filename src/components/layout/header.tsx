@@ -1,24 +1,49 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { LogOut, User, Wifi, WifiOff, Trash2, RefreshCw, Check } from 'lucide-react';
-import { useAuth } from '@/hooks/use-auth';
-import { useAppointmentsRealtime } from '@/hooks/use-realtime';
+import { LogOut, User, Trash2, RefreshCw, Check } from 'lucide-react';
+import { supabase } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 import type { Locale } from '@/lib/i18n/config';
 
 export function Header() {
   const t = useTranslations();
   const locale = useLocale() as Locale;
-  const { staff, signOut } = useAuth();
-  const { isConnected } = useAppointmentsRealtime();
 
+  const [staffName, setStaffName] = useState<string | null>(null);
+  const [staffRole, setStaffRole] = useState<string | null>(null);
   const [isClearing, setIsClearing] = useState(false);
   const [clearSuccess, setClearSuccess] = useState(false);
 
+  // Simple staff info fetch - no blocking, no complex auth hooks
+  useEffect(() => {
+    async function loadStaff() {
+      try {
+        console.log('[Header] Loading staff info...');
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: staff } = await supabase
+            .from('staff')
+            .select('name, role')
+            .eq('user_id', user.id)
+            .single();
+          if (staff) {
+            setStaffName(staff.name);
+            setStaffRole(staff.role);
+            console.log('[Header] Staff loaded:', staff.name);
+          }
+        }
+      } catch (err) {
+        console.error('[Header] Failed to load staff:', err);
+      }
+    }
+    loadStaff();
+  }, []);
+
   const handleSignOut = async () => {
-    await signOut();
+    await supabase.auth.signOut();
+    window.location.href = '/login';
   };
 
   const handleClearCache = async () => {
@@ -32,13 +57,9 @@ export function Header() {
     setClearSuccess(false);
 
     try {
-      // Clear localStorage
       localStorage.clear();
-
-      // Clear sessionStorage
       sessionStorage.clear();
 
-      // Clear Service Worker caches if available
       if ('caches' in window) {
         const cacheNames = await caches.keys();
         await Promise.all(
@@ -47,8 +68,6 @@ export function Header() {
       }
 
       setClearSuccess(true);
-
-      // Show success briefly then reload
       setTimeout(() => {
         window.location.reload();
       }, 1000);
@@ -66,32 +85,6 @@ export function Header() {
       </div>
 
       <div className="flex items-center gap-4">
-        {/* Real-time Connection Indicator */}
-        <div
-          className={cn(
-            'flex items-center gap-2 px-3 py-1 rounded-full text-xs',
-            isConnected
-              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-              : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-          )}
-          title={
-            isConnected
-              ? locale === 'ar' ? 'متصل - يتم مزامنة البيانات تلقائيًا' : 'Connected - Data syncing automatically'
-              : locale === 'ar' ? 'غير متصل' : 'Disconnected'
-          }
-        >
-          {isConnected ? (
-            <Wifi className="h-3 w-3" />
-          ) : (
-            <WifiOff className="h-3 w-3" />
-          )}
-          <span className="hidden md:inline">
-            {isConnected
-              ? locale === 'ar' ? 'متزامن' : 'Synced'
-              : locale === 'ar' ? 'غير متصل' : 'Offline'}
-          </span>
-        </div>
-
         {/* Clear Cache Button */}
         <button
           onClick={handleClearCache}
@@ -122,16 +115,16 @@ export function Header() {
           </span>
         </button>
 
-        {staff && (
+        {staffName && (
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-sm">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
                 <User className="h-4 w-4" />
               </div>
               <div className="hidden md:block">
-                <p className="font-medium">{staff.name}</p>
+                <p className="font-medium">{staffName}</p>
                 <p className="text-xs text-muted-foreground capitalize">
-                  {staff.role}
+                  {staffRole}
                 </p>
               </div>
             </div>
