@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useCallback, useMemo, useState } from 'react';
+import { useEffect, useCallback, useMemo, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 type PostgresChangeEvent = 'INSERT' | 'UPDATE' | 'DELETE' | '*';
 
@@ -32,6 +32,16 @@ export function useRealtime<T extends Record<string, unknown>>({
 
   const supabase = useMemo(() => createClient(), []);
 
+  // Store callbacks in refs to avoid re-subscribing on every render
+  const onInsertRef = useRef(onInsert);
+  const onUpdateRef = useRef(onUpdate);
+  const onDeleteRef = useRef(onDelete);
+  const onChangeRef = useRef(onChange);
+  onInsertRef.current = onInsert;
+  onUpdateRef.current = onUpdate;
+  onDeleteRef.current = onDelete;
+  onChangeRef.current = onChange;
+
   useEffect(() => {
     const channelName = `realtime:${schema}:${table}:${filter || 'all'}`;
 
@@ -49,20 +59,20 @@ export function useRealtime<T extends Record<string, unknown>>({
           setLastEvent(payload as RealtimePostgresChangesPayload<T>);
 
           // Call specific handlers
-          if (payload.eventType === 'INSERT' && onInsert) {
-            onInsert(payload.new as T);
-          } else if (payload.eventType === 'UPDATE' && onUpdate) {
-            onUpdate({
+          if (payload.eventType === 'INSERT' && onInsertRef.current) {
+            onInsertRef.current(payload.new as T);
+          } else if (payload.eventType === 'UPDATE' && onUpdateRef.current) {
+            onUpdateRef.current({
               new: payload.new as T,
               old: payload.old as Partial<T>,
             });
-          } else if (payload.eventType === 'DELETE' && onDelete) {
-            onDelete(payload.old as Partial<T>);
+          } else if (payload.eventType === 'DELETE' && onDeleteRef.current) {
+            onDeleteRef.current(payload.old as Partial<T>);
           }
 
           // Call generic handler
-          if (onChange) {
-            onChange(payload as RealtimePostgresChangesPayload<T>);
+          if (onChangeRef.current) {
+            onChangeRef.current(payload as RealtimePostgresChangesPayload<T>);
           }
         }
       )
@@ -73,7 +83,7 @@ export function useRealtime<T extends Record<string, unknown>>({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, table, schema, event, filter, onInsert, onUpdate, onDelete, onChange]);
+  }, [supabase, table, schema, event, filter]);
 
   return {
     isConnected,
@@ -86,11 +96,13 @@ export function useAppointmentsRealtime(
   onUpdate?: () => void
 ) {
   const [updateCount, setUpdateCount] = useState(0);
+  const onUpdateRef = useRef(onUpdate);
+  onUpdateRef.current = onUpdate;
 
   const handleChange = useCallback(() => {
     setUpdateCount((c) => c + 1);
-    onUpdate?.();
-  }, [onUpdate]);
+    onUpdateRef.current?.();
+  }, []);
 
   const { isConnected, lastEvent } = useRealtime({
     table: 'appointments',
@@ -111,10 +123,13 @@ export function useConversationsRealtime(
 ) {
   const [messageCount, setMessageCount] = useState(0);
 
+  const onNewMessageRef = useRef(onNewMessage);
+  onNewMessageRef.current = onNewMessage;
+
   const handleInsert = useCallback(() => {
     setMessageCount((c) => c + 1);
-    onNewMessage?.();
-  }, [onNewMessage]);
+    onNewMessageRef.current?.();
+  }, []);
 
   const { isConnected, lastEvent } = useRealtime({
     table: 'conversations',
