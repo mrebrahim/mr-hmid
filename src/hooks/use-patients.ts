@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { Patient, PatientFilters, PatientFormData } from '@/types';
 
@@ -24,22 +24,26 @@ export function usePatients(options: UsePatientsOptions = {}): UsePatientsReturn
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
+  const filtersRef = useRef(filters);
+  filtersRef.current = filters;
 
   const fetchPatients = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
+      await supabase.auth.getSession();
+
+      const currentFilters = filtersRef.current;
       let query = supabase
         .from('patients')
         .select('*')
         .order('created_at', { ascending: false });
 
-      // Apply search filter
-      if (filters?.search) {
+      if (currentFilters?.search) {
         query = query.or(
-          `name.ilike.%${filters.search}%,phone.ilike.%${filters.search}%,email.ilike.%${filters.search}%`
+          `name.ilike.%${currentFilters.search}%,phone.ilike.%${currentFilters.search}%,email.ilike.%${currentFilters.search}%`
         );
       }
 
@@ -55,7 +59,7 @@ export function usePatients(options: UsePatientsOptions = {}): UsePatientsReturn
     } finally {
       setIsLoading(false);
     }
-  }, [supabase, filters]);
+  }, [supabase]);
 
   useEffect(() => {
     fetchPatients();
@@ -128,12 +132,14 @@ export function usePatient(id: string) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     const fetchPatient = async () => {
       setIsLoading(true);
       setError(null);
+
+      await supabase.auth.getSession();
 
       const { data, error: fetchError } = await supabase
         .from('patients')

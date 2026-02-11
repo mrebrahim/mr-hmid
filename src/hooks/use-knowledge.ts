@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { KnowledgeBase, KnowledgeBaseFormData } from '@/types';
 
@@ -20,13 +20,15 @@ export function useKnowledge(): UseKnowledgeReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const fetchEntries = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
+      await supabase.auth.getSession();
+
       const { data, error: fetchError } = await supabase
         .from('knowledge_base')
         .select('*')

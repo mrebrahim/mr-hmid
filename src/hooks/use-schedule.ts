@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { ClinicSchedule, BlockedDate, ScheduleFormData, BlockedDateFormData } from '@/types';
 
@@ -21,13 +21,15 @@ export function useSchedule(): UseScheduleReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
+      await supabase.auth.getSession();
+
       // Fetch schedule
       const { data: scheduleData, error: scheduleError } = await supabase
         .from('clinic_schedule')

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import type { Staff } from '@/lib/supabase/types';
@@ -22,7 +22,7 @@ export function useAuth() {
     isAdmin: false,
   });
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const fetchStaffProfile = useCallback(
     async (userId: string) => {
@@ -69,7 +69,7 @@ export function useAuth() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
+      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') && session?.user) {
         const staff = await fetchStaffProfile(session.user.id);
         setState({
           user: session.user,
@@ -78,7 +78,7 @@ export function useAuth() {
           isAuthenticated: !!staff,
           isAdmin: staff?.role === 'admin',
         });
-      } else if (event === 'SIGNED_OUT') {
+      } else if (event === 'SIGNED_OUT' || (event === 'INITIAL_SESSION' && !session)) {
         setState({
           user: null,
           staff: null,

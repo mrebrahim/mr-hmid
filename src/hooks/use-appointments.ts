@@ -42,6 +42,9 @@ export function useAppointments(options: UseAppointmentsOptions = {}): UseAppoin
     const currentFilters = filtersRef.current;
 
     try {
+      // Ensure auth token is refreshed before querying
+      await supabase.auth.getSession();
+
       let query = supabase
         .from('appointments')
         .select(`
@@ -99,20 +102,7 @@ export function useAppointments(options: UseAppointmentsOptions = {}): UseAppoin
 
   useEffect(() => {
     fetchAppointments();
-
-    // Also refetch when auth session is established/refreshed
-    // This handles race conditions on page refresh where the fetch
-    // runs before the auth session is restored from cookies
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        fetchAppointments();
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [fetchAppointments, supabase]);
+  }, [fetchAppointments]);
 
   // Realtime subscription
   useEffect(() => {
