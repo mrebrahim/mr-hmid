@@ -173,6 +173,7 @@ export function useAppointments(options: UseAppointmentsOptions = {}): UseAppoin
       // Call API endpoint that updates status AND sends WhatsApp notification
       const response = await fetch(`/api/appointments/${id}/status`, {
         method: 'PATCH',
+        cache: 'no-store',
         headers: {
           'Content-Type': 'application/json',
         },

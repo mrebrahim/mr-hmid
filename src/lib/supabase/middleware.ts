@@ -62,6 +62,6 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  supabaseResponse.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  supabaseResponse.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate, proxy-revalidate');
   return supabaseResponse;
 }

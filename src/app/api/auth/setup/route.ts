@@ -1,6 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // This endpoint creates the initial admin user
 // Should only be used once during setup
 export async function POST(request: Request) {
