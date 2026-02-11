@@ -82,8 +82,16 @@ export function useAppointments(options: UseAppointmentsOptions = {}): UseAppoin
       }
 
       setAppointments(data as AppointmentWithRelations[]);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch appointments');
+    } catch (err: unknown) {
+      // Ignore AbortError (happens during component cleanup)
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === 'object' && err !== null && 'message' in err
+            ? String((err as { message: unknown }).message)
+            : 'Failed to fetch appointments';
+      setError(message);
     } finally {
       setIsLoading(false);
     }
@@ -91,7 +99,20 @@ export function useAppointments(options: UseAppointmentsOptions = {}): UseAppoin
 
   useEffect(() => {
     fetchAppointments();
-  }, [fetchAppointments]);
+
+    // Also refetch when auth session is established/refreshed
+    // This handles race conditions on page refresh where the fetch
+    // runs before the auth session is restored from cookies
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        fetchAppointments();
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [fetchAppointments, supabase]);
 
   // Realtime subscription
   useEffect(() => {
