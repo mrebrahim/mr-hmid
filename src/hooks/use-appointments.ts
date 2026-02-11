@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { Appointment, AppointmentWithRelations, AppointmentFilters } from '@/types';
 
@@ -31,11 +31,15 @@ export function useAppointments(options: UseAppointmentsOptions = {}): UseAppoin
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
+  const filtersRef = useRef(filters);
+  filtersRef.current = filters;
 
   const fetchAppointments = useCallback(async () => {
     setIsLoading(true);
     setError(null);
+
+    const currentFilters = filtersRef.current;
 
     try {
       let query = supabase
@@ -49,26 +53,26 @@ export function useAppointments(options: UseAppointmentsOptions = {}): UseAppoin
         .order('appointment_time', { ascending: true });
 
       // Apply filters
-      if (filters?.status && ['pending', 'confirmed', 'completed', 'cancelled', 'no_show'].includes(filters.status)) {
-        query = query.eq('status', filters.status as 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_show');
+      if (currentFilters?.status && ['pending', 'confirmed', 'completed', 'cancelled', 'no_show'].includes(currentFilters.status)) {
+        query = query.eq('status', currentFilters.status as 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_show');
       }
 
-      if (filters?.date) {
-        query = query.eq('appointment_date', filters.date);
+      if (currentFilters?.date) {
+        query = query.eq('appointment_date', currentFilters.date);
       }
 
-      if (filters?.dateRange) {
+      if (currentFilters?.dateRange) {
         query = query
-          .gte('appointment_date', filters.dateRange.from)
-          .lte('appointment_date', filters.dateRange.to);
+          .gte('appointment_date', currentFilters.dateRange.from)
+          .lte('appointment_date', currentFilters.dateRange.to);
       }
 
-      if (filters?.patientId) {
-        query = query.eq('patient_id', filters.patientId);
+      if (currentFilters?.patientId) {
+        query = query.eq('patient_id', currentFilters.patientId);
       }
 
-      if (filters?.serviceId) {
-        query = query.eq('service_id', filters.serviceId);
+      if (currentFilters?.serviceId) {
+        query = query.eq('service_id', currentFilters.serviceId);
       }
 
       const { data, error: fetchError } = await query;
@@ -83,7 +87,7 @@ export function useAppointments(options: UseAppointmentsOptions = {}): UseAppoin
     } finally {
       setIsLoading(false);
     }
-  }, [supabase, filters]);
+  }, [supabase]);
 
   useEffect(() => {
     fetchAppointments();
@@ -192,7 +196,7 @@ export function useAppointment(id: string) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     const fetchAppointment = async () => {
