@@ -155,7 +155,7 @@ export default function DashboardPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Fetch all appointments
-  const { appointments, isLoading, updateStatus, refetch } = useAppointments();
+  const { appointments, isLoading, error, updateStatus, refetch } = useAppointments();
 
   // Enable realtime updates
   const { isConnected } = useAppointmentsRealtime(() => {
@@ -246,6 +246,14 @@ export default function DashboardPage() {
           </span>
         </button>
       </div>
+
+      {/* Error Display */}
+      {error && (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200">
+          <p className="font-medium">{locale === 'ar' ? 'خطأ في تحميل البيانات:' : 'Error loading data:'}</p>
+          <p className="text-sm mt-1">{error}</p>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
