@@ -181,48 +181,12 @@ export default function DashboardPage() {
   // Get unique patients count
   const uniquePatients = new Set(appointments.map(a => a.patient_id)).size;
 
-  // Handle confirm - updates status and triggers n8n webhook
   const handleConfirm = async (id: string) => {
     await updateStatus(id, 'confirmed');
-
-    // Trigger n8n webhook for confirmation notification
-    const appointment = appointments.find(a => a.id === id);
-    if (appointment) {
-      try {
-        await fetch('/api/webhooks/n8n/appointment-confirmed', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            record: appointment,
-            old_record: { ...appointment, status: 'pending' }
-          })
-        });
-      } catch (error) {
-        console.error('Failed to trigger n8n webhook:', error);
-      }
-    }
   };
 
-  // Handle cancel - updates status and triggers n8n webhook
   const handleCancel = async (id: string) => {
     await updateStatus(id, 'cancelled', 'assistant');
-
-    // Trigger n8n webhook for cancellation notification
-    const appointment = appointments.find(a => a.id === id);
-    if (appointment) {
-      try {
-        await fetch('/api/webhooks/n8n/appointment-cancelled', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            record: { ...appointment, status: 'cancelled' },
-            old_record: appointment
-          })
-        });
-      } catch (error) {
-        console.error('Failed to trigger n8n webhook:', error);
-      }
-    }
   };
 
   return (

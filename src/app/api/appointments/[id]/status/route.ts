@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { sendWhatsAppMessage } from '@/lib/evolution/client';
-import { formatTime, formatDateShort } from '@/lib/utils/date';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -57,51 +55,9 @@ export async function PATCH(
       );
     }
 
-    // Get patient phone - from relation or direct field
-    const patientPhone = appointment.patient?.phone || appointment.patient_phone;
-    const patientName = appointment.patient?.name || appointment.patient_name || '';
-    const serviceName = appointment.service?.name_ar || appointment.purpose || 'الخدمة';
-
-    // Send WhatsApp notification
-    if (patientPhone) {
-      let message = '';
-
-      if (status === 'confirmed') {
-        message = `✅ مرحباً ${patientName}
-
-تم تأكيد موعدك بنجاح!
-
-📅 التاريخ: ${formatDateShort(appointment.appointment_date)}
-⏰ الوقت: ${formatTime(appointment.appointment_time, 'ar')}
-🏥 الخدمة: ${serviceName}
-
-نتطلع لزيارتك!
-
-للإلغاء أو إعادة الجدولة، راسلنا هنا.`;
-      } else if (status === 'cancelled') {
-        message = `نعتذر ${patientName}،
-
-تم إلغاء موعدك يوم ${formatDateShort(appointment.appointment_date)}
-
-هل تريد حجز موعد آخر؟ راسلنا هنا وسنساعدك في اختيار موعد مناسب.`;
-      }
-
-      if (message) {
-        const whatsappResult = await sendWhatsAppMessage(patientPhone, message);
-
-        if (!whatsappResult.success) {
-          console.error('[Status Update] WhatsApp failed:', whatsappResult.error);
-          // Don't fail the request, just log the error
-        } else {
-          console.log('[Status Update] WhatsApp sent to:', patientPhone);
-        }
-      }
-    }
-
     return NextResponse.json({
       success: true,
       status,
-      whatsappSent: !!patientPhone
     });
   } catch (error) {
     console.error('[Status Update] Error:', error);

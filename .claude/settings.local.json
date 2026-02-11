@@ -58,7 +58,9 @@
       "Bash(npx supabase:*)",
       "Bash(git commit:*)",
       "Bash(dir:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh repo create:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
